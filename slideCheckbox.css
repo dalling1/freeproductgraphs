@@ -1,0 +1,75 @@
+/* Inspired by https://www.w3schools.com/howto/howto_css_switch.asp */
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 19px;
+  vertical-align: middle;
+  margin: 0 10px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .1s;
+}
+
+/* slider "button" in "off" position */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 2px;
+  bottom: 2px; /* was 2px but shift down for the inset shadow */
+  background-color: black;
+  transition: .1s;
+}
+
+/* Slider box background */
+input:checked + .slider {
+/*  background-color: #2196F3; */
+  background-color: #f34; /* dark red */
+  background-color: #3b4; /* green */
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+  box-shadow: 0 0 1px black;
+}
+
+/* slider "button" in "on" position */
+input:checked + .slider:before {
+  transform: translateX(12px);
+  background-color: white;
+}
+
+/* Rounded slider box (which contains the "button") */
+.slider.round {
+  border-radius: 5px;  /* rounded rectangle */
+  border-radius: 20px; /* oval */
+  box-shadow: inset 2px 3px 4px black;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+  /* box-shadow: 3px 3px 2px #555, 4px 4px 1px #111;*/
+  box-shadow: -1px -1px 2px #999;
+}
+
+input:checked + .slider.round:before {
+  border-radius: 50%;
+  /* box-shadow: 3px 3px 2px #555, 4px 4px 1px #111;*/
+  box-shadow: -1px -1px 2px #555;
+}

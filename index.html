@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>Free Products of Graphs</title>
+<link href="https://fonts.googleapis.com/css?family=Fredoka+One|Open+Sans+Condensed:300&display=swap" rel="stylesheet">
+
+<link href="slideCheckbox.css" rel="stylesheet"/>
+<style>
+html {
+ background-color: #444;
+ color: white;
+ font-family: "Open Sans Condensed", sans-serif;
+ scroll-behavior: smooth;
+}
+h1,h3 {
+ text-align: center;
+}
+button {
+ font-family: "Open Sans Condensed", sans-serif;
+}
+a {
+ color: #99d;
+}
+svg {
+ background-color: #888;
+ margin: 0;
+}
+.shadowed {
+ box-shadow: inset 10px 10px 13px #555;
+}
+rect {
+ fill: none;
+ pointer-events: all;
+}
+.cursor {
+ fill: none;
+ stroke: #bbb;
+ stroke-width: 1px;
+ stroke-dasharray: 1,3;
+}
+.newcursor {
+ fill: none;
+ stroke: #bbb;
+ stroke-width: 1px;
+ stroke-dasharray: 1,3;
+}
+.node {
+ fill: #ccc;
+ stroke: #000;
+ stroke-width: 1.5px;
+ stroke-width: 1px;
+ box-shadow: 5px 5px 3px #fff;
+}
+#rootnode {
+  fill: #3b4;
+}
+#basenode0,
+#basenode1,
+#basenode2,
+#basenode3,
+#basenode4,
+#basenode5,
+#basenode6,
+#basenode7,
+#basenode8,
+#basenode9,
+#basenode10,
+#basenode11,
+#basenode12
+{
+  fill: #44f;
+}
+line {
+ stroke-linecap: round;
+ stroke-linejoin: miter;
+}
+.productnode {
+ fill: #367;
+ stroke: #000;
+ stroke-width: 1.5px;
+ paint-order: stroke;
+ box-shadow: 5px 5px 3px #fff;
+}
+.productupdatefn,
+.productaddress {
+ font-family: "Fredoka One", sans-serif;
+ stroke: black;
+ stroke-width: 1px;
+ paint-order: stroke;
+ fill: #ff8;
+ font-size: 14px;
+}
+.examinenode {
+ fill: #ff0;
+ stroke: cyan;
+}
+.fixed {
+  fill: #f00;
+}
+.node.nearby {
+  fill: #ff0;
+}
+
+.link {
+  stroke: white;
+}
+.productlink {
+  stroke: #ff0;
+}
+.delimiter {
+ stroke: #aaa;
+ stroke-width: 1px;
+ stroke-dasharray: 7,7;
+}
+#topmatter {
+ /* width: 90vw; */
+}
+.grapharea {
+ /* float: left; */
+ clear: both;
+ margin: 0;
+ padding: 0;
+ overflow-x: auto;
+ overflow-y: hidden;
+}
+#protographControls,
+#freeProductControls {
+ max-width: 90%;
+ background-color: #999;
+ padding: 5px;
+ margin: 8px;
+ margin-left: 3px;
+ margin-top: 3px;
+ border: 2px solid black;
+ box-shadow: inset -4px -4px 6px #666, -3px 3px 5px #222;
+ border-radius: 10px;
+}
+.slideCheckBox {
+ display: inline-block;
+}
+output {
+ display: inline-block; /* to let us fix the width */
+ width: 20px; /* we don't want the element size to change with the string length of the value it shows */
+}
+.onecontrol {
+ vertical-align: middle;
+ display: inline-block;
+ text-align: center;
+ margin: 0 4px;
+}
+#textgraphs {
+ /* height: 80vh; */
+ min-height: 150px;
+}
+.dotgraph {
+ float: left;
+ /* clear: both; */
+ height: 90%;
+ margin: 10px;
+ margin-top: 0;
+}
+.dotgraph h3 {
+ margin: 2px;
+ padding: 0;
+}
+.dotgraph textarea {
+ min-width: 500px;
+ /* height: calc(100% - 1em); */
+ min-height: 140px;
+ padding: 5px;
+}
+input[type=range]{
+ width: 90px;
+}
+.controlwrapper {
+ background-color: #777;
+ box-shadow: 1px 1px 1px #333;
+ padding: 3px;
+ border: 0px solid #cc8;
+ text-align:center;
+}
+.wrappertext {
+ text-decoration: underline;
+}
+#freeProductControls .controlwrapper .slider:before {
+ background-color: white;
+}
+#freeProductControls .controlwrapper .slider,
+#freeProductControls .controlwrapper input:checked + .slider {
+ background-color: #e83;
+}
+.postcontrols {
+ margin: 8px;
+ margin-top: 0;
+ margin-left: 3px;
+}
+.postcontrols .onecontrol {
+ vertical-align: top;
+}
+.smaller {
+ font-size: 14px;
+ vertical-align: top;
+}
+</style>
+<body onload="setControls()">
+ <div id="topmatter">
+  <h1>Free Products of Graphs</h1>
+ </div>
+
+ <div id="protographControls">
+  <div class="onecontrol">
+   <span title="Click to reset" style="cursor:pointer;" onclick="thespread.value=4; thespreadOutput.value = thespread.value; newrestart();">Edge length:</span><br/>
+   <input type="range" style="vertical-align:top;" min="4" max="50" step="1" value="4" id="thespread" oninput="thespreadOutput.value = thespread.value; newrestart();" />
+   <output name="thespreadOutputName" id="thespreadOutput"></output>
+  </div>
+
+  <div class="onecontrol controlwrapper">
+   <span class="wrappertext">DOT output</span><br/>
+   <div class="onecontrol">Edge colours<br/><label class="switch"><input type="checkbox" checked id="theprotographcolours" ><span class="slider round"></span></label></div>
+   <div class="onecontrol">Incl. protographs<br/><label class="switch"><input type="checkbox" checked id="theincludeprotographs" ><span class="slider round"></span></label></div>
+   <div class="onecontrol">Label<br/><label class="switch"><input type="checkbox" checked id="thelabelprotographs" ><span class="slider round"></span></label></div>
+  </div>
+ </div>
+ <div class="grapharea" id="graphareaConstruction"></div>
+ <div id="freeProductControls">
+  <!-- slider control for the number of iterations of the free product graph to construct -->
+  <div class="onecontrol">Depth:<br/>
+   <input type="range" style="vertical-align:top;" min="0" max="10" step="1" value="1" id="thedepth" oninput="thedepthOutput.value = thedepth.value;" />
+   <output name="thedepthOutputName" id="thedepthOutput"></output>
+  </div>
+  <!-- slider control for the strength of repulsion between nodes -->
+  <div class="onecontrol">
+   <span title="Click to reset" style="cursor:pointer;" onclick="thecharge.value=400; thechargeOutput.value = thecharge.value; newrestart();">Repulsion:</span><br/>
+   <input type="range" style="vertical-align:top;" min="0" max="600" step="20" value="180" id="thecharge" oninput="thechargeOutput.value = thecharge.value; newrestart();" />
+   <output name="thechargeOutputName" id="thechargeOutput"></output>
+  </div>
+  <!-- control for SVG box physics boundary (constrain elements within the box on the page) -->
+  <div class="onecontrol">Boundary<br/><label class="switch"><input type="checkbox" id="theboundaryFP" onchange="newrestart()" ><span class="slider round"></span></label></div>
+  <!-- control for turning the edge colours on and off -->
+  <div class="onecontrol">Edge colours<br/><label class="switch"><input type="checkbox" checked id="theedgecoloursFP" onchange="newrestart()" ><span class="slider round"></span></label></div>
+  <!-- control for making the free product graph fade with distance from the root node -->
+  <div class="onecontrol">Fade<br/><label class="switch"><input type="checkbox" checked id="theopacityFP" onchange="newrestart()" ><span class="slider round"></span></label></div>
+  <!-- control for changing the edge width based on either the graph the edge is part of or distance from the root node (depth) -->
+  <div class="onecontrol controlwrapper">
+   <span class="wrappertext">Edge thickness</span><br/>
+   <div class="slideCheckbox">
+    graph
+    <label class="switch">
+     <input type="checkbox" checked id="thethicknessFP" onchange="newrestart()" >
+     <span class="slider round"></span>
+    </label>
+    depth
+   </div>
+  </div>
+  <!-- control for turning "antigravity" on or off: when on there is a gentle repulsion from the centre which makes the layouts much better -->
+  <div class="onecontrol">Antigravity<br/><label class="switch"><input type="checkbox" checked id="theantigravFP" onchange="newrestart()" ><span class="slider round"></span></label></div>
+  <!-- control for fixing the root node in place (this control is not working currently) -->
+  <div class="onecontrol">Fix root<br/><label title="not working" class="switch"><input type="checkbox" id="thefixrootnodeFP" onchange="newrestart()" ><span class="slider round"></span></label></div>
+  <!-- control for setting whether the node labels should be on all the time, or only shown when hovering near each node -->
+  <div class="onecontrol controlwrapper">
+   <span class="wrappertext">Show labels</span><br/>
+   <div class="slideCheckbox">
+    hover
+    <label class="switch">
+     <input type="checkbox" id="theshowlabelsFP" onchange="showAllLabels();"/>
+     <span class="slider round"></span>
+    </label>
+    always
+   </div>
+  </div>
+  <!-- control for choosing which label to show on nodes -->
+  <div class="onecontrol controlwrapper">
+   <span class="wrappertext">Node labels</span><br/>
+   <select id="thelabeltype" onchange="showAllLabels();">
+    <option value="none">none</option>
+    <option value="updatefn">Update function</option>
+    <option value="address">Node address</option>
+   </select>
+  </div>
+  <!-- take the protographs, construct their free product graph (to the desired depth) and draw it on the page using the d3js library -->
+  <button class="onecontrol" style="font-size:2em;" onclick="makeFreeProductGraph();">GO</button>
+ </div>
+
+ <!-- some buttons for use once the free product graph has been created -->
+ <div class="postcontrols">
+  <!-- save the free product graph as a PDF file -->
+  <button onClick="savePDF()" title="Saves a PDF file">Save PDF</button>
+  <!-- save the free product graph as a PNG file (optionally with a transparent background) -->
+  <div class="onecontrol">
+   <button onClick="savePNG()" title="Saves a PNG file">Save PNG</button><label for="transparencybutton"><br/><span class="smaller">Transparent</span><input type="checkbox" id="thetransparencybutton" /></label>
+  </div>
+  <!-- apply a nudge to each node -->
+  <button onclick="bump();">Bump nodes</button><br/>
+ </div>
+
+ <div class="grapharea" id="graphareaFreeProduct"></div>
+ <div id="textgraphs">
+  <div class="dotgraph">
+   <h3>Prototype graphs in DOT format <a href="http://viz-js.com">[vis]</a></h3>
+   <textarea id="protographDOT"></textarea>
+  </div>
+  <div class="dotgraph">
+   <h3>Free product graph in DOT format <a href="http://viz-js.com">[vis]</a></h3>
+   <textarea id="freegraphDOT"></textarea>
+  </div>
+ </div>
+
+ <div style="color:cyan;clear:both;">
+  <h2>Things to add</h2>
+  <ul>
+   <li>add colour pickers for protograph colours</li>
+   <li>add colour picker for node colours?</li>
+   <li>put instructions into each protograph construction zone?</li>
+   <li>add node labels to protographs</li>
+   <li>drag nodes between protograph? (breaking all their links and changing which protograph they are in)</li>
+  </ul>
+  <h2>Things to fix</h2>
+  <ul>
+   <li>exported PNG images have the containing SVG box border on them! remove</li>
+   <li>node colours missing in PDF (always white?)</li>
+   <li>nodes are a little twitchy when the mouse moves over them</li>
+   <li>shift-click and double-click both create protograph nodes: make a common function!</li>
+  </ul>
+ </div>
+
+ <script src="js/FileSaver.min.js"></script>
+ <script src="js/jspdf.min.js"></script>
+ <script src="js/rgbcolor.js"></script>
+ <script src="js/saveSvgAsPng.js"></script>
+ <script src="js/svg2pdf.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+ <script src="js/freeprod.js"></script>
+ <script>
+  /* Set the control displays to the default value */
+  function setControls(){
+   thedepthOutput.value=thedepth.value;
+   thechargeOutput.value=thecharge.value;
+   thespreadOutput.value=thespread.value;
+  }
+ </script>
+</body>
+</html>
