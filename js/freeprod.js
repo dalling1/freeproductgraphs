@@ -1231,12 +1231,14 @@ function savePDF(){
  // This produces a PDF which is approx. 33% larger than on screen;
  // changing "scale" to 75% broke the offsets and/or width-height, so revisit that later.
  // -- this is because scale is applied before offsets, so the offsets need to be recalculated...
+ document.getElementById("thefreeproductgraph").classList.remove("shadowed");
  svg2pdf(document.getElementById("thefreeproductgraph"), thepdf, {
          xOffset: xoff,
          yOffset: yoff,
          scale: 1,
  });
  thepdf.save("graph.pdf");
+ document.getElementById("thefreeproductgraph").classList.add("shadowed");
  return 0;
 }
 
@@ -1254,7 +1256,10 @@ function savePNG(){
   width: saveBounds.maxX-saveBounds.minX,
   height: saveBounds.maxY-saveBounds.minY,
  };
+ document.getElementById("thefreeproductgraph").classList.remove("shadowed"); // works
  saveSvgAsPng(document.getElementById("thefreeproductgraph"), "graph.png", saveOptions);
+ setTimeout(() => { document.getElementById("thefreeproductgraph").classList.add("shadowed"); }, 100); // this is enough delay for saveSvgAsPng to finish
+// document.getElementById("thefreeproductgraph").classList.add("shadowed"); // restored too soon, PNG still contains the shadow
 }
 
 // function to get the bounding box of the SVG elements in the free product graph
@@ -1264,7 +1269,9 @@ function bounds(){
  var minY = Number.POSITIVE_INFINITY;
  var maxY = Number.NEGATIVE_INFINITY;
 
-// var showlabels = document.getElementById("theshowlabelsFP").checked; // off=hover, on=always
+ var showlabels = document.getElementById("theshowlabelsFP").checked; // off=hover, on=always
+ var labeltype = document.getElementById("thelabeltype").value; // none, updatefn, address
+ var uselabels = showlabels & labeltype!="none";
 
  // Loop over the children (nodes, edges, text labels) of the graph
  //  -- we don't do anything for links, since (for now) their end nodes are always represented
@@ -1273,28 +1280,32 @@ function bounds(){
  for (var i=0;i<svgchildren.length;i++){
    switch (svgchildren[i].nodeName){
     case "circle": // a node
-     var bbox = getTransformedBBox(svgchildren[i]);
-     var circleX = parseFloat(bbox.x); // left
-     var circleY = parseFloat(bbox.y); // top (on screen)
-     var circleW = parseFloat(bbox.width);
-     var circleH = parseFloat(bbox.height);
-     if ((circleX)<minX)         minX=(circleX);
-     if ((circleX+circleW)>maxX) maxX=(circleX+circleW);
-     if ((circleY)<minY)         minY=(circleY);
-     if ((circleY+circleH)>maxY) maxY=(circleY+circleH);
+     if (svgchildren[i].id!="thenewcursor"){ /* ignore the cursor when calculating bounds */
+      var bbox = getTransformedBBox(svgchildren[i]);
+      var circleX = parseFloat(bbox.x); // left
+      var circleY = parseFloat(bbox.y); // top (on screen)
+      var circleW = parseFloat(bbox.width);
+      var circleH = parseFloat(bbox.height);
+      if ((circleX)<minX)         minX=(circleX);
+      if ((circleX+circleW)>maxX) maxX=(circleX+circleW);
+      if ((circleY)<minY)         minY=(circleY);
+      if ((circleY+circleH)>maxY) maxY=(circleY+circleH);
+     }
      break;
     case "text": // a label
-//     if (showlabels>0){
-      var bbox = getTransformedBBox(svgchildren[i]);
-      var textX = parseFloat(bbox.x); // left
-      var textY = parseFloat(bbox.y); // top (on screen)
-      var textW = parseFloat(bbox.width);
-      var textH = parseFloat(bbox.height);
-      if ((textX)<minX)       minX=(textX);
-      if ((textX+textW)>maxX) maxX=(textX+textW);
-      if ((textY)<minY)       minY=(textY);
-      if ((textY+textH)>maxY) maxY=(textY+textH);
-//     }
+     if (uselabels){
+      if (svgchildren[i].attributes.ondisplay.value=="true"){
+       var bbox = getTransformedBBox(svgchildren[i]);
+       var textX = parseFloat(bbox.x); // left
+       var textY = parseFloat(bbox.y); // top (on screen)
+       var textW = parseFloat(bbox.width);
+       var textH = parseFloat(bbox.height);
+       if ((textX)<minX)       minX=(textX);
+       if ((textX+textW)>maxX) maxX=(textX+textW);
+       if ((textY)<minY)       minY=(textY);
+       if ((textY+textH)>maxY) maxY=(textY+textH);
+      }
+     }
      break;
    } // end switch
  }
